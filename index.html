@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="pendeja" content="width=device-width, initial-scale=1" />
+  <title>no sea mala con mi coranzoncito</title>
+  <style>
+    /* Fondo negro que cubre toda la pantalla */
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      background-color: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      cursor: pointer; /* Indica que se puede clicar */
+      user-select: none;
+    }
+
+    /* Video oculto hasta iniciar, pero al mostrarse ocupa toda la pantalla */
+    video {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: contain; /* mantiene proporción y muestra todo el video */
+      display: none;
+      background: black;
+      outline: none;
+      z-index: 1;
+    }
+
+    /* Barra de volumen en esquina inferior derecha */
+    #volume-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 5px 10px;
+      border-radius: 8px;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      z-index: 2; /* encima del video */
+    }
+
+    /* Slider de volumen */
+    #volume-slider {
+      width: 100px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <video id="video" playsinline>
+    <source src="a.mp4_1758596487582.mp4" type="video/mp4" />
+    Tu navegador no soporta la etiqueta de video.
+  </video>
+
+  <div id="volume-container">
+    <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="1" />
+  </div>
+
+  <script>
+    const video = document.getElementById('video');
+    const volumeContainer = document.getElementById('volume-container');
+    const volumeSlider = document.getElementById('volume-slider');
+
+    // Inicializar volumen
+    video.volume = 1;
+    volumeSlider.value = 1;
+
+    // Al hacer clic en cualquier parte del body, iniciamos video con audio
+    function startVideo() {
+      video.style.display = 'block';
+      volumeContainer.style.display = 'flex';
+      video.play();
+      // Quitamos el listener para que solo funcione una vez
+      document.body.removeEventListener('click', startVideo);
+      // Cambiamos el cursor a default
+      document.body.style.cursor = 'default';
+    }
+
+    volumeSlider.addEventListener('input', (e) => {
+      video.volume = e.target.value;
+    });
+
+    document.body.addEventListener('click', startVideo);
+  </script>
+
+</body>
+</html>
