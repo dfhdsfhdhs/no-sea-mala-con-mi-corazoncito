@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="pendeja" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>no sea mala con mi coranzoncito</title>
   <style>
     /* Fondo negro que cubre toda la pantalla */
@@ -16,8 +16,9 @@
       justify-content: center;
       align-items: center;
       overflow: hidden;
-      cursor: pointer; /* Indica que se puede clicar */
+      cursor: pointer;
       user-select: none;
+      position: relative;
     }
 
     /* Video oculto hasta iniciar, pero al mostrarse ocupa toda la pantalla */
@@ -26,7 +27,7 @@
       top: 0; left: 0;
       width: 100vw;
       height: 100vh;
-      object-fit: contain; /* mantiene proporción y muestra todo el video */
+      object-fit: contain;
       display: none;
       background: black;
       outline: none;
@@ -44,7 +45,7 @@
       display: none;
       align-items: center;
       gap: 8px;
-      z-index: 2; /* encima del video */
+      z-index: 3;
     }
 
     /* Slider de volumen */
@@ -52,12 +53,46 @@
       width: 100px;
       cursor: pointer;
     }
+
+    /* Mensaje inicial "clic aquí" centrado */
+    #start-message {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 2em;
+      font-family: Arial, sans-serif;
+      pointer-events: none;
+      user-select: none;
+      z-index: 4;
+    }
+
+    /* Mensajes finales centrados, ocultos inicialmente */
+    #end-message, #never-leave-message {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-family: Arial, sans-serif;
+      font-size: 3em;
+      display: none;
+      pointer-events: none;
+      user-select: none;
+      z-index: 5;
+      opacity: 1;
+      transition: opacity 2s ease;
+    }
+
   </style>
 </head>
 <body>
 
+  <div id="start-message">clic aquí</div>
+
   <video id="video" playsinline>
-    <source src="a.mp4_1758596487582.mp4" type="video/mp4" />
+    <source src="y.mp4" type="video/mp4" />
     Tu navegador no soporta la etiqueta de video.
   </video>
 
@@ -65,25 +100,54 @@
     <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="1" />
   </div>
 
+  <div id="end-message">te amo ❤️</div>
+  <div id="never-leave-message">nunca me dejes</div>
+
   <script>
     const video = document.getElementById('video');
     const volumeContainer = document.getElementById('volume-container');
     const volumeSlider = document.getElementById('volume-slider');
+    const startMessage = document.getElementById('start-message');
+    const endMessage = document.getElementById('end-message');
+    const neverLeaveMessage = document.getElementById('never-leave-message');
 
     // Inicializar volumen
     video.volume = 1;
     volumeSlider.value = 1;
 
-    // Al hacer clic en cualquier parte del body, iniciamos video con audio
+    // Iniciar video al click
     function startVideo() {
+      startMessage.style.display = 'none'; 
       video.style.display = 'block';
       volumeContainer.style.display = 'flex';
       video.play();
-      // Quitamos el listener para que solo funcione una vez
       document.body.removeEventListener('click', startVideo);
-      // Cambiamos el cursor a default
       document.body.style.cursor = 'default';
     }
+
+    // Al terminar el video, mostrar mensajes con efecto
+    video.addEventListener('ended', () => {
+      video.style.display = 'none';
+      volumeContainer.style.display = 'none';
+
+      // Mostrar "te amo" y luego desaparecerlo
+      endMessage.style.display = 'block';
+      endMessage.style.opacity = '1';
+
+      setTimeout(() => {
+        endMessage.style.opacity = '0';
+      }, 2000); // después de 2 segundos empieza a desvanecerse
+
+      // Después de que termine el fade out de "te amo", mostrar "nunca me dejes"
+      setTimeout(() => {
+        endMessage.style.display = 'none';
+        neverLeaveMessage.style.display = 'block';
+        neverLeaveMessage.style.opacity = '0';
+        // Forzar reflow para que la transición funcione
+        void neverLeaveMessage.offsetWidth;
+        neverLeaveMessage.style.opacity = '1';
+      }, 4000); // 2s de mensaje visible + 2s de fade out
+    });
 
     volumeSlider.addEventListener('input', (e) => {
       video.volume = e.target.value;
